@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pratchawin Tanyong | Links</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background-color: #0d0f17;
+      color: #f3f4f6;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-btn {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    .glow-bg {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+      border-radius: 50%;
+      z-index: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 relative overflow-x-hidden">
+
+  <!-- Background Ambient Lights -->
+  <div class="glow-bg -top-20 -left-20"></div>
+  <div class="glow-bg -bottom-20 -right-20"></div>
+
+  <main class="w-full max-w-md relative z-10 my-8">
+    <div class="glass-card rounded-3xl p-6 md:p-8 shadow-2xl text-center">
+      
+      <!-- Profile Header -->
+      <div class="relative inline-block mb-4">
+        <div class="w-24 h-24 rounded-full overflow-hidden p-1 bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 shadow-lg mx-auto">
+          <img id="avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Profile" class="w-full h-full object-cover rounded-full">
+        </div>
+      </div>
+
+      <h1 id="name" class="text-2xl font-bold text-white tracking-wide">Pratchawin Tanyong</h1>
+      <p id="handle" class="text-sm text-gray-400 mt-1 mb-6 font-light">@pratchawintanyong1023</p>
+
+      <!-- Links Container -->
+      <div id="links-container" class="space-y-3.5">
+        <!-- Links จะถูกเรนเดอร์ผ่าน JavaScript -->
+      </div>
+
+      <!-- Footer / Share Button -->
+      <div class="mt-8 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-gray-400">
+        <span>© <?= new Date().getFullYear() ?> Pratchawin</span>
+        <button onclick="copyCurrentUrl()" class="flex items-center gap-1.5 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full border border-white/10">
+          <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+          <span id="share-text">แชร์หน้านี้</span>
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // โหลดข้อมูลจาก Apps Script
+    google.script.run.withSuccessHandler(renderProfile).getProfileData();
+
+    function renderProfile(data) {
+      document.getElementById('name').innerText = data.name;
+      document.getElementById('handle').innerText = data.handle;
+      document.getElementById('avatar').src = data.avatarUrl;
+
+      const container = document.getElementById('links-container');
+      container.innerHTML = '';
+
+      data.links.forEach(link => {
+        const linkEl = document.createElement('a');
+        linkEl.href = link.url;
+        linkEl.target = '_blank';
+        linkEl.rel = 'noopener noreferrer';
+        linkEl.className = 'glass-btn w-full p-4 rounded-2xl flex items-center justify-between group text-left';
+
+        linkEl.innerHTML = `
+          <div class="flex items-center space-x-3.5">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-110" style="background-color: ${link.color}20; border: 1px solid ${link.color}40;">
+              <i data-lucide="${link.icon}" style="color: ${link.color}"></i>
+            </div>
+            <div>
+              <div class="font-medium text-white text-base leading-snug group-hover:text-indigo-300 transition-colors">${link.title}</div>
+              <div class="text-xs text-gray-400 font-light mt-0.5">${link.subtitle}</div>
+            </div>
+          </div>
+          <i data-lucide="chevron-right" class="w-5 h-5 text-gray-500 group-hover:text-white group-hover:translate-x-1 transition-all"></i>
+        `;
+
+        container.appendChild(linkEl);
+      });
+
+      lucide.createIcons();
+    }
+
+    function copyCurrentUrl() {
+      navigator.clipboard.writeText(window.location.href);
+      const shareText = document.getElementById('share-text');
+      shareText.innerText = 'คัดลอกลิงก์แล้ว!';
+      setTimeout(() => {
+        shareText.innerText = 'แชร์หน้านี้';
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
